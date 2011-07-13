@@ -20,17 +20,24 @@ position: relative;
 display: block; 
 cursor: pointer;
 }
+#carousel div.g-thumbs ul {
+position: absolute;
+left: 0;
+top: 20px;
+}
 #carousel div.g-thumbs img { display: block; }
 #carousel div.g-thumbs .up {
 position: absolute;
 top: 0;
 left: 0;
+z-index: 10;
 background: #fff url('../img/arrow-up.png') no-repeat 50% 50%;
 }
 #carousel div.g-thumbs .down {
 position: absolute;
 bottom: 0;
 left: 0;
+z-index: 10;
 background: #fff url('../img/arrow-down.png') no-repeat 50% 50%;
 }
 #carousel div.g-thumbs .up:hover,

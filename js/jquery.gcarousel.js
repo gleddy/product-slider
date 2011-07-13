@@ -28,26 +28,30 @@
             width: 400,
             thumbSide: 'left',
             thumbWidth: 60,
-            arrowHeight: 20
+            arrowHeight: 20,
+            imageFade: 200
         }, options);
         
-        var defaultCSS = {
+        var carouselCSS = {
             'height' : options.height,
             'width' : options.width
         }
-        
         var arrowCSS = {
             'height' : options.arrowHeight,
             'width' : options.thumbWidth
         };
+        var sliderCSS = {
+            'height' : options.height - options.arrowHeight,
+            'padding-top' : options.arrowHeight,
+            'width' : '60px'
+        }
         
         return this.each(function() {
 
-            var $this = $(this);
-            var kids = $this.find('li');
-
+            var $this = $(this); // wrapper
+            var image = $this.find('li'); // large image
             
-            kids.css(defaultCSS);
+            image.css(carouselCSS);
 
             // generate thumbnails
             var faux = $('<div></div>').addClass('g-thumbs');
@@ -63,33 +67,52 @@
             
             var textToInsert = [];
             var i = 0;
-            $.each(kids, function(count, item) {
+            $.each(image, function(count, item) {
                 textToInsert[i++] = '<li><a>';
                 textToInsert[i++] = item.innerHTML;
                 textToInsert[i++] = '</a></li>';
             });
             ul.append(textToInsert.join(''));
+            faux.css(sliderCSS);
 
-            // thumbnail slider
-            faux.css('height', options.height - options.arrowHeight);
-            faux.css('padding-top', options.arrowHeight);
-            
-            $('div.g-thumbs > a').css(arrowCSS).bind('click', function(event) {
-                alert( $(this).attr('class'));
-                // start figure out animation here...
-                // how much to move? (based on height + margin of image)
-                // width direction (based on class?)
-            });
-            
-            // thumbnail styles
             $('.g-thumbs img').css('width', options.thumbWidth);
             $(this).addClass(options.thumbSide);
+            
+            // animate thumbnails
+            $('div.g-thumbs a.up, div.g-thumbs a.down').css(arrowCSS).bind('click', function(event) {
+                
+                var direction = $(this).attr('class');
+                var increment = $('.g-thumbs li').outerHeight(true);
+                var slider = $('.g-thumbs ul');
+                var firstKid = $('.g-thumbs li:first-child');
+                var lastKid = $('.g-thumbs li:last-child');
+                var curPos = parseInt(slider.css('top'));
+                
+                // rewrite, append <li> then animate the cell height into the frame
+                if (direction == 'up') {
+                    slider.animate({
+                        top: curPos - increment
+                    }, 250, function() {
+                        var kid = firstKid.detach();
+                        slider.append(kid);
+                        slider.css('top', options.arrowHeight);
+                    });
+                } else {
+                    slider.animate({
+                        top: curPos + increment
+                    }, 250, function() {
+                        var kid = lastKid.detach();
+                        slider.prepend(kid);
+                        slider.css('top', options.arrowHeight);
+                    });
+                }         
+            });
 
-            // display large images onclick
+            // onclick display large image
             $('.g-thumbs li').bind('click', function() {
                 var index = $('.g-thumbs li').index(this);
-                kids.css('display', 'none');
-                kids.eq(index).css('display', 'block');
+                image.css('display', 'none');
+                image.eq(index).fadeIn(options.imageFade).css('display', 'block');
                 // fade in for new image...
             });
 
